@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miniprogramlearn.mapper.OrganizerMapper">
+
+
+<!--    根据userid查找组织者表，对应的组织者-->
+    <select id="selectOByUserid" parameterType="int" resultType="organizer">
+        select * from organizer where userid=#{userid}
+    </select>
+
+<!--    根据oid查找组织者组织的活动-->
+    <select id="selectOAByOid" parameterType="int" resultType="activity">
+        select a.* from activity a,org_act oa where oa.oid=#{oid} and a.aid=oa.aid
+    </select>
+
+<!--    根据userid查找组织者组织的活动 前提是要已经判断过该user是组织者-->
+    <select id="selectOAByUserid" parameterType="paramUserAct" resultType="activity">
+        select distinct a.* from activity a,organizer o,org_act oa where o.userid=#{userid} and oa.oid=o.oid and a.aid=oa.aid
+        <if test="inputString!=null">
+            <if test="inputString!='' ">
+                <if test="inputString!='%%' ">
+                    and a.aname like #{inputString} or a.ainfo like #{inputString} or a.organizername like #{inputString}
+                </if>
+            </if>
+        </if>
+    </select>
+
+<!--    插入新的组织者-->
+    <insert id="insertOrg" parameterType="organizer"  useGeneratedKeys="true" keyProperty="oid">
+        insert into organizer(oid, unit, authtime, authway, authinfo, mode, userid)
+        values (#{oid},#{unit},#{authtime},#{authway},#{authinfo},#{mode},#{userid})
+    </insert>
+
+
+<!--&lt;!&ndash; 组织者申请新的活动  前提是判断出该用户属于组织者   &ndash;&gt;-->
+<!--    <insert id="orgInsertAct" parameterType="activity">-->
+<!--        insert into activity(aid, aname, aicon, signtimefrom, signtimeto, place, abegintime, aendtime, organizername, organizerph, ainfo, amode)-->
+<!--        values (null,#{aname},#{aicon},#{signtimefrom},#{signtimeto},#{place},#{abegintime},#{aendtime},#{organizername},#{organizerph},#{ainfo},#{amode})-->
+<!--    </insert>-->
+
+
+<!--    组织者申请新的活动 插入到org_act表中 前提是判断出该用户属于组织者-->
+    <insert id="insertActToOA" parameterType="int">
+        insert into org_act(oaid, oid, aid) values (null,#{oid},#{aid})
+    </insert>
+
+
+
+</mapper>

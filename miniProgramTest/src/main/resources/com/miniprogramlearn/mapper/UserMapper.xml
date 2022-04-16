@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miniprogramlearn.mapper.UserMapper">
+    <insert id="insert" parameterType="com.miniprogramlearn.entity.User" useGeneratedKeys="true" keyProperty="userid">
+        INSERT INTO user (openid,userid,nickName, avatarUrl, sessionKey) VALUES (#{openid},#{userid}, #{nickName}, #{avatarUrl}, #{sessionKey})
+    </insert>
+
+    <select id="selectByOpid" parameterType="string" resultType="com.miniprogramlearn.entity.User">
+        select * from user where openid=#{openid}
+    </select>
+
+
+<!--    使用动态sql判断是否有搜索条件  查询用户参加的活动-->
+    <select id="selectAByUserid" parameterType="paramUserAct" resultType="activity">
+        select distinct a.* from activity a,user_act ua where ua.userid=#{userid} and a.aid=ua.aid
+        <if test="inputString!=null">
+            <if test="inputString!='' ">
+                <if test="inputString!='%%' ">
+                    and aname like #{inputString} or ainfo like #{inputString} or organizername like #{inputString}
+                </if>
+            </if>
+        </if>
+<!--        <if test="inputString!='%%' ">-->
+<!--            and aname like #{inputString} or ainfo like #{inputString} or organizername like #{inputString}-->
+<!--        </if>-->
+
+    </select>
+
+    <select id="selectByUserid" parameterType="int" resultType="user">
+        select * from user where userid=#{userid}
+    </select>
+
+<!--用户 报名活动 插入user_act表-->
+    <insert id="insertUserAct" parameterType="userAct">
+        insert into user_act(userid, aid, mode) VALUES (#{userid},#{aid},#{mode})
+    </insert>
+
+<!--   检查用户是否报名过该活动了  根据uid aid查看报名的该活动的具体信息-->
+    <select id="selectUAByUidAid" parameterType="userAct" resultType="userAct">
+        select * from user_act where userid=#{userid} and aid=#{aid}
+    </select>
+
+<!--    用户取消 已经报名的该活动-->
+    <delete id="deleteUAByUidAid" parameterType="userAct">
+        delete from user_act where userid=#{userid} and aid=#{aid}
+    </delete>
+
+
+<!--&lt;!&ndash;    根据oid查找组织者组织的活动&ndash;&gt;-->
+<!--    <select id="selectOAByOid" parameterType="int" resultType="activity">-->
+<!--        select * from activity a,org_act oa where oa.oid=#{oid} and a.aid=oa.aid-->
+<!--    </select>-->
+
+<!--&lt;!&ndash;    根据userid查找组织者组织的活动 前提是要已经判断过该user是组织者&ndash;&gt;-->
+<!--    <select id="selectOAByUserid" parameterType="int" resultType="activity">-->
+<!--        select * from activity a,user u,org_act oa where u.userid=#{userid} and oa.oid=u.oid and a.aid=oa.aid-->
+<!--    </select>-->
+
+
+
+</mapper>

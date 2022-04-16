@@ -1,0 +1,67 @@
+#spring.mvc.converters.preferred-json-mapper=jackson
+
+server:
+  servlet:
+    context-path: /mini
+  port: 8088
+
+
+
+http_pool:
+  max_total: 200
+  default_max_per_route: 100
+  connect_timeout: 5000
+  connection_request_timeout: 1000
+  socket_timeout: 65000
+  validate_after_inactivity: 2000
+
+
+mini:
+  appid: 、、、、、、
+  app_secret: 、、、、、
+  grant_type: 、、、、、
+
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/minisqltest?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8
+    username: 、、、
+    password: 、、、
+
+
+  servlet:
+    multipart:
+      max-file-size: 10MB #设置文件上传单个的最大大小  带上代为MB
+      max-request-size: 50MB #设置总的上传文件的总大小
+  jackson:
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss  #这个应该是配置了全局的日期类型的转换器 直接在这里配置之后全局使用
+
+
+pagehelper:
+  # 指定数据库，不指定的话会默认自动检测数据库类型 还有一个属性是dialect它们之间的区别再上网查
+  helper-dialect: mysql
+  # 是否启用分页合理化。
+  # 如果启用，当pagenum<1时，会自动查询第一页的数据，当pagenum>pages时，自动查询最后一页数据；
+  # 不启用的，以上两种情况都会返回空数据
+  reasonable: true
+  #如果启用supportMethodsArguments参数，则pageHelper可以自动拦截请求参数中的pageNum,pageSize参数
+  #不启用supportMethodsArguments参数，则需使用PageHelper.startPage(pageNum,pageSize)方法调用
+  support-methods-arguments: true
+  # 用于从对象中根据属性名取值，
+  # 可以配置 pageNum,pageSize,count,pageSizeZero,reasonable，不配置映射的用默认值，
+  # 默认值为pageNum=pageNum;pageSize=pageSize;count=countSql;reasonable=reasonable;pageSizeZero=pageSizeZero
+  params: count=countSql
+
+#指定mybatis打印日志log-impl
+#mybatis:
+  #configuration:
+    #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+  #使用下面这个可以开启别名自动配置 在xml映射文件中没有必要写全类的限定名
+mybatis:
+  type-aliases-package: com.miniprogramlearn.entity
+
+
+

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miniprogramlearn.mapper.ActivityMapper">
+
+    <resultMap id="activityMap" type="Activity">
+        <!--一般对于主键映射习惯用id标签-->
+        <id column="aid" property="aid"/>
+        <result column="aname" property="aname"/>
+        <result column="aicon" property="aicon"/>
+        <result column="signtimefrom" property="signtimefrom"/>
+        <result column="signtimeto" property="signtimeto"/>
+        <result column="place" property="place"/>
+        <result column="abegintime" property="abegintime"/>
+        <result column="abeginto" property="abeginto"/>
+        <result column="aendtime" property="aendtime"/>
+        <result column="organizername" property="organizername"/>
+        <result column="organizerph" property="organizerph"/>
+        <result column="ainfo" property="ainfo"/>
+        <result column="amode" property="amode"/>
+
+        <!--集合的封装使用集合collection标签 -->
+        <!--property 封装到的实体类的属性集合名称 ofType集合中元素数据类型-->
+        <collection property="activityImgList" ofType="ActivityImg">
+            <!--一般对于主键映射习惯用id标签-->
+<!--            <id column="amid" property="amid"/>-->
+            <result column="aimid" property="aid"/>
+            <result column="aimgz" property="aimgz"/>
+        </collection>
+    </resultMap>
+
+
+
+<!--    查询出所有活动而且活动对象包含了 活动详情页面的所有图片-->
+    <select id="findAllPage1" resultMap="activityMap">
+        select *,a.aid aid,ai.aid aimid from activity a left join a_img ai on a.aid=ai.aid
+    </select>
+
+    <!--    查询出所有活动而且活动对象 不包含 活动详情页面的所有图片 where amode!='审核中' and amode!=''-->
+    <select id="findAllPage2" resultType="activity">
+        select * from activity where amode='已通过'
+    </select>
+
+    <!--    查询出某个活动id对应的活动而且包含 活动详情页面的所有图片-->
+    <select id="findAandImgById" resultMap="activityMap">
+        select *,a.aid aid,ai.aid aimid from activity a left join act_img ai on a.aid=ai.aid where a.aid=#{aid}
+    </select>
+
+<!--根据aid查找活动-->
+    <select id="selectActByAid" parameterType="int" resultType="activity">
+        select * from activity where aid=#{aid}
+    </select>
+
+
+<!-- 根据用户的oid 查询 自己组织的活动  -->
+
+
+<!--    插入新的活动-->
+    <insert id="insertAct" parameterType="activity" useGeneratedKeys="true" keyProperty="aid">
+        insert into activity(aid, aname, aicon, signtimefrom, signtimeto, place, abegintime, aendtime, organizername, organizerph, ainfo, amode)
+        values (#{aid},#{aname},#{aicon},#{signtimefrom},#{signtimeto},#{place},#{abegintime},#{aendtime},#{organizername},#{organizerph},#{ainfo},#{amode})
+    </insert>
+
+
+<!--    插入到 act_image表 活动所有的详情图片-->
+    <insert id="insertActImg">
+        insert into act_img(amid, aid, aimgz) VALUES (null,#{aid},#{aimgz});
+    </insert>
+
+<!--    搜索活动 searchAct 搜索活动，关键字 有活动名字 ，活动内容，活动组织者姓名，时间，-->
+    <select id="searchAct" parameterType="string" resultType="activity">
+        select a1.* from activity a1 join activity a2 on a1.aid=a2.aid and a1.amode='已通过' where a1.aname like #{condition} or a1.ainfo like #{condition} or a1.organizername like #{condition}
+    </select>
+
+</mapper>
